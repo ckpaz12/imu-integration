@@ -189,8 +189,8 @@ void StartReadIMU(void *argument)
 void addtoIMUQueue(char* type, char* dimension, uint8_t* data){
     IMU_msg_t imu_message;
 
-    imu_message.imu_type[1] = type;
-    imu_message.dimension[1] = dimension;
+    imu_message.imu_type = type[0];
+    imu_message.dimension = dimension[0];
     for (int i = 0; i < 4; i++) {
         imu_message.data[i] = data[i];
     }
@@ -209,25 +209,29 @@ void StartTransmitData(void *argument){
     if (imu_queue_status != osOK){
       osThreadYield();
     }
-    // IMU ID: 1 ASCII characters
-    uint8_t imu_id[1] = "@";
-    HAL_UART_Transmit(&huart2, imu_id, sizeof(imu_id), 1000);
 
-    transmitData(imu_message.imu_type, sizeof(imu_message.imu_type));
-    transmitData(imu_message.dimension, sizeof(imu_message.dimension));
-    transmitData(imu_message.data, sizeof(imu_message.data));
+    uint8_t imu_buffer[9];
+
+    // IMU ID: 1 ASCII characters
+    imu_buffer[0] = '@';
+
+    //Data from queue
+    imu_buffer[1] = imu_message.imu_type;
+    imu_buffer[2] = imu_message.dimension;
+    for (int i = 0; i < 4; i++) {
+        imu_buffer[i + 3] = imu_message.data[i];
+    }
 
     // NEW LINE: 1 ASCII character
-    uint8_t newline[1] = "\n";
-    HAL_UART_Transmit(&huart2, newline, sizeof(newline), 1000);
+    imu_buffer[7] = '\n';
 
     // CARRIAGE RETURN: 1 ASCII character
-    uint8_t carriage[1] = "\r";
-    HAL_UART_Transmit(&huart2, carriage, sizeof(carriage), 1000);
+    imu_buffer[8] = '\r';
+
+    HAL_UART_Transmit(&huart2, imu_buffer, sizeof(imu_buffer), 1000);
   }
 
   // In case we accidentally exit from task loop
   osThreadTerminate(NULL);
 }
 /* USER CODE END Application */
-

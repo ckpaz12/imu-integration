@@ -12,8 +12,8 @@ enum AccelType {
 };
 
 typedef struct {
-  uint8_t imu_type[1];
-  uint8_t dimension[1];
+  uint8_t imu_type;
+  uint8_t dimension;
   uint8_t data[4];
 } IMU_msg_t;
 
