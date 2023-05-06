@@ -229,6 +229,7 @@ __NO_RETURN void StartTransmitData(void *argument){
     imu_buffer[8] = '\r';
 
     HAL_UART_Transmit(&huart2, imu_buffer, sizeof(imu_buffer), 1000);
+    HAL_UART_Transmit(&huart3, imu_buffer, sizeof(imu_buffer), 1000);
   }
 
   // In case we accidentally exit from task loop
