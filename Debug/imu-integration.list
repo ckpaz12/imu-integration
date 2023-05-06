@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000029  00000000  00000000  000201e0  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00019d25  00000000  00000000  00020209  2**0
+ 12 .debug_info   00019d3e  00000000  00000000  00020209  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000036dd  00000000  00000000  00039f2e  2**0
+ 13 .debug_abbrev 000036fc  00000000  00000000  00039f47  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000016b8  00000000  00000000  0003d610  2**3
+ 14 .debug_aranges 000016b8  00000000  00000000  0003d648  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00001588  00000000  00000000  0003ecc8  2**3
+ 15 .debug_ranges 00001588  00000000  00000000  0003ed00  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001ad33  00000000  00000000  00040250  2**0
+ 16 .debug_macro  0001ad33  00000000  00000000  00040288  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00018ecf  00000000  00000000  0005af83  2**0
+ 17 .debug_line   00018ecf  00000000  00000000  0005afbb  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00098080  00000000  00000000  00073e52  2**0
+ 18 .debug_str    00098080  00000000  00000000  00073e8a  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0010bed2  2**0
+ 19 .comment      00000050  00000000  00000000  0010bf0a  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000703c  00000000  00000000  0010bf24  2**2
+ 20 .debug_frame  0000703c  00000000  00000000  0010bf5c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1512,85 +1512,86 @@ void StartBlinkLed(void *argument)
 * @retval None
 */
 
-void StartReadIMU(void *argument)
+__NO_RETURN void StartReadIMU(void *argument)
 {
  8000ff0:	b580      	push	{r7, lr}
- 8000ff2:	b088      	sub	sp, #32
+ 8000ff2:	b08a      	sub	sp, #40	; 0x28
  8000ff4:	af00      	add	r7, sp, #0
  8000ff6:	6078      	str	r0, [r7, #4]
   union FloatBytes gy_x, gy_y, gy_z, ax_x, ax_y, ax_z;
   /* Infinite loop */
   while(1)
   {
-    gy_x.float_value = gyro(GYRO_X);
+    float ans = gyro(GYRO_X);
  8000ff8:	2000      	movs	r0, #0
  8000ffa:	f7ff fea5 	bl	8000d48 <gyro>
- 8000ffe:	4603      	mov	r3, r0
- 8001000:	61fb      	str	r3, [r7, #28]
+ 8000ffe:	6278      	str	r0, [r7, #36]	; 0x24
+    gy_x.float_value = ans;
+ 8001000:	6a7b      	ldr	r3, [r7, #36]	; 0x24
+ 8001002:	623b      	str	r3, [r7, #32]
     gy_y.float_value = gyro(GYRO_Y);
- 8001002:	2001      	movs	r0, #1
- 8001004:	f7ff fea0 	bl	8000d48 <gyro>
- 8001008:	4603      	mov	r3, r0
- 800100a:	61bb      	str	r3, [r7, #24]
+ 8001004:	2001      	movs	r0, #1
+ 8001006:	f7ff fe9f 	bl	8000d48 <gyro>
+ 800100a:	4603      	mov	r3, r0
+ 800100c:	61fb      	str	r3, [r7, #28]
     gy_z.float_value = gyro(GYRO_Z);
- 800100c:	2002      	movs	r0, #2
- 800100e:	f7ff fe9b 	bl	8000d48 <gyro>
- 8001012:	4603      	mov	r3, r0
- 8001014:	617b      	str	r3, [r7, #20]
+ 800100e:	2002      	movs	r0, #2
+ 8001010:	f7ff fe9a 	bl	8000d48 <gyro>
+ 8001014:	4603      	mov	r3, r0
+ 8001016:	61bb      	str	r3, [r7, #24]
     ax_x.float_value = accel(ACCEL_X);
- 8001016:	2000      	movs	r0, #0
- 8001018:	f7ff fefe 	bl	8000e18 <accel>
- 800101c:	4603      	mov	r3, r0
- 800101e:	613b      	str	r3, [r7, #16]
+ 8001018:	2000      	movs	r0, #0
+ 800101a:	f7ff fefd 	bl	8000e18 <accel>
+ 800101e:	4603      	mov	r3, r0
+ 8001020:	617b      	str	r3, [r7, #20]
     ax_y.float_value = accel(ACCEL_Y);
- 8001020:	2001      	movs	r0, #1
- 8001022:	f7ff fef9 	bl	8000e18 <accel>
- 8001026:	4603      	mov	r3, r0
- 8001028:	60fb      	str	r3, [r7, #12]
+ 8001022:	2001      	movs	r0, #1
+ 8001024:	f7ff fef8 	bl	8000e18 <accel>
+ 8001028:	4603      	mov	r3, r0
+ 800102a:	613b      	str	r3, [r7, #16]
     ax_z.float_value = accel(ACCEL_Z);
- 800102a:	2002      	movs	r0, #2
- 800102c:	f7ff fef4 	bl	8000e18 <accel>
- 8001030:	4603      	mov	r3, r0
- 8001032:	60bb      	str	r3, [r7, #8]
+ 800102c:	2002      	movs	r0, #2
+ 800102e:	f7ff fef3 	bl	8000e18 <accel>
+ 8001032:	4603      	mov	r3, r0
+ 8001034:	60fb      	str	r3, [r7, #12]
 
     // IMU DATA: 16 ASCII characters
     addtoIMUQueue("G", "X", gy_x);
- 8001034:	69fa      	ldr	r2, [r7, #28]
- 8001036:	4911      	ldr	r1, [pc, #68]	; (800107c <StartReadIMU+0x8c>)
- 8001038:	4811      	ldr	r0, [pc, #68]	; (8001080 <StartReadIMU+0x90>)
- 800103a:	f000 f829 	bl	8001090 <addtoIMUQueue>
+ 8001036:	6a3a      	ldr	r2, [r7, #32]
+ 8001038:	4910      	ldr	r1, [pc, #64]	; (800107c <StartReadIMU+0x8c>)
+ 800103a:	4811      	ldr	r0, [pc, #68]	; (8001080 <StartReadIMU+0x90>)
+ 800103c:	f000 f828 	bl	8001090 <addtoIMUQueue>
     addtoIMUQueue("G", "Y", gy_y);
- 800103e:	69ba      	ldr	r2, [r7, #24]
- 8001040:	4910      	ldr	r1, [pc, #64]	; (8001084 <StartReadIMU+0x94>)
- 8001042:	480f      	ldr	r0, [pc, #60]	; (8001080 <StartReadIMU+0x90>)
- 8001044:	f000 f824 	bl	8001090 <addtoIMUQueue>
+ 8001040:	69fa      	ldr	r2, [r7, #28]
+ 8001042:	4910      	ldr	r1, [pc, #64]	; (8001084 <StartReadIMU+0x94>)
+ 8001044:	480e      	ldr	r0, [pc, #56]	; (8001080 <StartReadIMU+0x90>)
+ 8001046:	f000 f823 	bl	8001090 <addtoIMUQueue>
     addtoIMUQueue("G", "Z", gy_z);
- 8001048:	697a      	ldr	r2, [r7, #20]
- 800104a:	490f      	ldr	r1, [pc, #60]	; (8001088 <StartReadIMU+0x98>)
- 800104c:	480c      	ldr	r0, [pc, #48]	; (8001080 <StartReadIMU+0x90>)
- 800104e:	f000 f81f 	bl	8001090 <addtoIMUQueue>
+ 800104a:	69ba      	ldr	r2, [r7, #24]
+ 800104c:	490e      	ldr	r1, [pc, #56]	; (8001088 <StartReadIMU+0x98>)
+ 800104e:	480c      	ldr	r0, [pc, #48]	; (8001080 <StartReadIMU+0x90>)
+ 8001050:	f000 f81e 	bl	8001090 <addtoIMUQueue>
     addtoIMUQueue("A", "X", ax_x);
- 8001052:	693a      	ldr	r2, [r7, #16]
- 8001054:	4909      	ldr	r1, [pc, #36]	; (800107c <StartReadIMU+0x8c>)
- 8001056:	480d      	ldr	r0, [pc, #52]	; (800108c <StartReadIMU+0x9c>)
- 8001058:	f000 f81a 	bl	8001090 <addtoIMUQueue>
+ 8001054:	697a      	ldr	r2, [r7, #20]
+ 8001056:	4909      	ldr	r1, [pc, #36]	; (800107c <StartReadIMU+0x8c>)
+ 8001058:	480c      	ldr	r0, [pc, #48]	; (800108c <StartReadIMU+0x9c>)
+ 800105a:	f000 f819 	bl	8001090 <addtoIMUQueue>
     addtoIMUQueue("A", "Y", ax_y);
- 800105c:	68fa      	ldr	r2, [r7, #12]
- 800105e:	4909      	ldr	r1, [pc, #36]	; (8001084 <StartReadIMU+0x94>)
- 8001060:	480a      	ldr	r0, [pc, #40]	; (800108c <StartReadIMU+0x9c>)
- 8001062:	f000 f815 	bl	8001090 <addtoIMUQueue>
+ 800105e:	693a      	ldr	r2, [r7, #16]
+ 8001060:	4908      	ldr	r1, [pc, #32]	; (8001084 <StartReadIMU+0x94>)
+ 8001062:	480a      	ldr	r0, [pc, #40]	; (800108c <StartReadIMU+0x9c>)
+ 8001064:	f000 f814 	bl	8001090 <addtoIMUQueue>
     addtoIMUQueue("A", "Z", ax_z);
- 8001066:	68ba      	ldr	r2, [r7, #8]
- 8001068:	4907      	ldr	r1, [pc, #28]	; (8001088 <StartReadIMU+0x98>)
- 800106a:	4808      	ldr	r0, [pc, #32]	; (800108c <StartReadIMU+0x9c>)
- 800106c:	f000 f810 	bl	8001090 <addtoIMUQueue>
+ 8001068:	68fa      	ldr	r2, [r7, #12]
+ 800106a:	4907      	ldr	r1, [pc, #28]	; (8001088 <StartReadIMU+0x98>)
+ 800106c:	4807      	ldr	r0, [pc, #28]	; (800108c <StartReadIMU+0x9c>)
+ 800106e:	f000 f80f 	bl	8001090 <addtoIMUQueue>
 
     osDelay(1000);
- 8001070:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
- 8001074:	f003 f8e2 	bl	800423c <osDelay>
-    gy_x.float_value = gyro(GYRO_X);
- 8001078:	e7be      	b.n	8000ff8 <StartReadIMU+0x8>
- 800107a:	bf00      	nop
+ 8001072:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
+ 8001076:	f003 f8e1 	bl	800423c <osDelay>
+  {
+ 800107a:	e7bd      	b.n	8000ff8 <StartReadIMU+0x8>
  800107c:	08009aec 	.word	0x08009aec
  8001080:	08009af0 	.word	0x08009af0
  8001084:	08009af4 	.word	0x08009af4
@@ -1660,7 +1661,7 @@ void addtoIMUQueue(char* type, char* dimension, union FloatBytes data){
 
 080010ec <StartTransmitData>:
 
-void StartTransmitData(void *argument){
+__NO_RETURN void StartTransmitData(void *argument){
  80010ec:	b580      	push	{r7, lr}
  80010ee:	b08a      	sub	sp, #40	; 0x28
  80010f0:	af00      	add	r7, sp, #0

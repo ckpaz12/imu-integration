@@ -152,7 +152,7 @@ void StartBlinkLed(void *argument)
 * @retval None
 */
 
-void StartReadIMU(void *argument)
+__NO_RETURN void StartReadIMU(void *argument)
 {
   union FloatBytes gy_x, gy_y, gy_z, ax_x, ax_y, ax_z;
   /* Infinite loop */
@@ -194,7 +194,7 @@ void addtoIMUQueue(char* type, char* dimension, union FloatBytes data){
     osMessageQueuePut(imuMessageQueueHandle, &imu_message, 0U, 0U);
 }
 
-void StartTransmitData(void *argument){
+__NO_RETURN void StartTransmitData(void *argument){
   osStatus_t imu_queue_status;
   IMU_msg_t imu_message;
 
