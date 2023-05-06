@@ -102,7 +102,7 @@ void StartBlinkLed(void *argument);
 void StartReadIMU(void *argument);
 void StartTransmitData(void *argument);
 
-void addtoIMUQueue(char* type, char* dimension, uint8_t* data);
+void addtoIMUQueue(char* type, char* dimension, union FloatBytes data);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -165,17 +165,13 @@ void StartReadIMU(void *argument)
     ax_y.float_value = accel(ACCEL_Y);
     ax_z.float_value = accel(ACCEL_Z);
 
-
-    printf("\e[1;1H\e[38;2;252;186;3mGYRO\e[0m | X : %i | Y : %i | Z : %i \n\r", (int)gy_x.float_value, (int)gy_y.float_value, (int)gy_z.float_value);
-    printf("\e[1;1H\e[38;2;252;186;3mACCL\e[0m | X : %i | Y : %i | Z : %i \n\r", (int)ax_x.float_value, (int)ax_y.float_value, (int)ax_z.float_value);
-
     // IMU DATA: 16 ASCII characters
-    addtoIMUQueue("G", "X", gy_x.bytes);
-    addtoIMUQueue("G", "Y", gy_y.bytes);
-    addtoIMUQueue("G", "Z", gy_z.bytes);
-    addtoIMUQueue("A", "X", ax_x.bytes);
-    addtoIMUQueue("A", "Y", ax_y.bytes);
-    addtoIMUQueue("A", "Z", ax_z.bytes);
+    addtoIMUQueue("G", "X", gy_x);
+    addtoIMUQueue("G", "Y", gy_y);
+    addtoIMUQueue("G", "Z", gy_z);
+    addtoIMUQueue("A", "X", ax_x);
+    addtoIMUQueue("A", "Y", ax_y);
+    addtoIMUQueue("A", "Z", ax_z);
 
     osDelay(1000);
 
@@ -186,13 +182,13 @@ void StartReadIMU(void *argument)
 
 }
 
-void addtoIMUQueue(char* type, char* dimension, uint8_t* data){
+void addtoIMUQueue(char* type, char* dimension, union FloatBytes data){
     IMU_msg_t imu_message;
 
     imu_message.imu_type = type[0];
     imu_message.dimension = dimension[0];
     for (int i = 0; i < 4; i++) {
-        imu_message.data[i] = data[i];
+        imu_message.data[i] = data.bytes[i];
     }
 
     osMessageQueuePut(imuMessageQueueHandle, &imu_message, 0U, 0U);
@@ -204,13 +200,17 @@ void StartTransmitData(void *argument){
 
   while(1)
   {
+    // Check if there are messages in the queue
+    if (osMessageQueueGetCount(imuMessageQueueHandle) == 0) {
+        continue;
+    }
+
     imu_queue_status = osMessageQueueGet(imuMessageQueueHandle, &imu_message, NULL, osWaitForever);
 
     if (imu_queue_status != osOK){
       osThreadYield();
     }
-
-    uint8_t imu_buffer[9];
+    uint8_t imu_buffer[9] = {0};
 
     // IMU ID: 1 ASCII characters
     imu_buffer[0] = '@';
